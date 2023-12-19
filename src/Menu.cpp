@@ -5,7 +5,7 @@ Menu::Menu(Adafuit_SSD1306* display)
 {
   if (!display->begin(SSD1306_SWITCHAPVCC, 0x3C))
   {
-    Serial.println("SSD1306 allocation failed);
+    Serial.println("SSD1306 allocation failed");
   }
 
   display->setTextSize(1);
