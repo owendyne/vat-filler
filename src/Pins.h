@@ -14,6 +14,12 @@ public:
   // current sensing pins
   static const int CS1 = A1;
   static const int CS2 = A2;
+
+  // input pins
+  static const int I1 = 4;
+  static const int I1 = 5;
+  static const int I1 = 6;
+  static const int I1 = 7;
 };
 
 class OLED
