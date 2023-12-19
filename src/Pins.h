@@ -17,9 +17,9 @@ public:
 
   // input pins
   static const int I1 = 4;
-  static const int I1 = 5;
-  static const int I1 = 6;
-  static const int I1 = 7;
+  static const int I2 = 5;
+  static const int I3 = 6;
+  static const int I4 = 7;
 };
 
 class OLED
