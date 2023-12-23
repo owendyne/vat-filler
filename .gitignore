@@ -1,4 +1,5 @@
 .idea
 build/**
-/build.sh
+cmake/**
+/scripts/configure.sh
 BoardOptions.cmake

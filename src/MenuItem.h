@@ -12,10 +12,11 @@ template<typename ReturnType, typename... Args>
 struct MenuItem
 {
 public:
-  FunctionPtrType<ReturnType, Args...> func;
-  char* info_msg;
+    FunctionPtrType<ReturnType, Args...> func;
+    char *info_msg;
 
-  MenuItem(FunctionPtrType<ReturnType, Args...> func, char* info_msg) : func(func), info_msg(info_msg) {};
+    MenuItem(FunctionPtrType<ReturnType, Args...> func, char *info_msg) : func(func), info_msg(info_msg)
+    {};
 };
 
 

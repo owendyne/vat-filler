@@ -1,50 +1,98 @@
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <RotaryEncoder.h>
+#include <Arduino.h>
+#include <AccelStepper.h>
 
+#include "LiquidSensor.h"
 #include "Pins.h"
-#include "Menu.h"
+#include "Config.h"
 
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
+LiquidSensor sensor(Pins::LiquidSensor);
+AccelStepper stepper(AccelStepper::FULL4WIRE, Pins::L298N::I1, Pins::L298N::I2, Pins::L298N::I3, Pins::L298N::I4);
 
-// objects;
-Adafruit_SSD1306* display;
-RotaryEncoder* encoder;
+// state
+unsigned long last_sensor_check = 0;
+bool pump_active = false;
 
-void encoder_int() { encoder->tick(); };
-
-void test(Adafruit_SSD1306* display, RotaryEncoder* encoder)
+void initialiseStepper()
 {
-  display->clearDisplay();
-  display->setCursor(0,0);
+    stepper.setMaxSpeed(Config::MaxSpeed * Config::StepsPerRevolution);
+    stepper.setAcceleration(Config::Acceleration * Config::StepsPerRevolution);
+    stepper.setSpeed(Config::Speed * Config::StepsPerRevolution);
+}
 
-  display->println("test program");
-  display->display();
+void setPumpState(bool enabled)
+{
+    int state = enabled ? HIGH : LOW;
+    digitalWrite(Pins::L298N::E1, state);
+    digitalWrite(Pins::L298N::E2, state);
+    digitalWrite(Pins::LED, state);
 
-  delay(1000);
+    if (enabled) stepper.move(Config::StepDelta);
+    else stepper.stop();
+
+    pump_active = enabled;
 }
 
 
-MenuItem<Adafuit_SSD1306*, RotaryEncoder*> item_a(test, "TEST");
+
 
 void setup()
 {
-  Serial.begin(115200);
+    Serial.begin(9600);
 
-  attachInterrupt(Pins::RotaryEncoder::A, encoder_int, CHANGE);
-  attachInterrupt(Pins::RotaryEncoder::B, encoder_int, CHANGE);
+    pinMode(Pins::L298N::E1, OUTPUT);
+    pinMode(Pins::L298N::E2, OUTPUT);
+    pinMode(Pins::LED, OUTPUT);
+    pinMode(Pins::STOP, INPUT);
 
+    setPumpState(false);
 
-  display = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-  menu = new Menu(display);
-
-  menu->insert(item_a);
+    initialiseStepper();
 }
 
 void loop()
 {
-  const auto& dir = encoder->getDirection();
-  menu->update(dir);
+    bool stop = digitalRead(Pins::STOP);
+    if (stop)
+    {
+        if (pump_active)
+        {
+            digitalWrite(Pins::L298N::E1, LOW);
+            digitalWrite(Pins::L298N::E2, LOW);
+        }
+        while (digitalRead(Pins::STOP) == HIGH)
+        {
+            digitalWrite(Pins::LED, HIGH);
+            delay(500);
+            digitalWrite(Pins::LED, LOW);
+            delay(500);
+        }
+        if (pump_active)
+        {
+            digitalWrite(Pins::L298N::E1, HIGH);
+            digitalWrite(Pins::L298N::E2, HIGH);
+        }
+    }
+
+    long distance = stepper.distanceToGo();
+    long position = stepper.currentPosition();
+
+    // if pump is active, make sure its always targeting StepDelta
+    if (pump_active)
+    {
+        if (distance < Config::StepDelta) stepper.moveTo(position + Config::StepDelta - distance);
+        stepper.run();
+    }
+
+
+    if (millis() - last_sensor_check >= Config::LiquidInterval)
+    {
+        last_sensor_check = millis();
+
+        float liquid = sensor.read();
+        bool liquid_low = liquid < Config::LiquidThreshold;
+
+        if (liquid_low && !pump_active) setPumpState(true);
+        if (!liquid_low && pump_active) setPumpState(false);
+    }
+
 }

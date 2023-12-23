@@ -9,32 +9,36 @@
 struct Node
 {
 public:
-  MenuItem item;
-  Node* next = nullptr;
-  Node* prev = nullptr;
+    MenuItem item;
+    Node *next = nullptr;
+    Node *prev = nullptr;
 
-  Node(MenuItem& item) : item(item) {};
+    Node(MenuItem &item) : item(item)
+    {};
 };
 
 class Menu
 {
 private:
-  Adafuit_SSD1306* display;
-  Node* head = nullptr;
-  Node* tail = nullptr;
-  Node* curr = nullptr;
+    Adafuit_SSD1306 *display;
+    Node *head = nullptr;
+    Node *tail = nullptr;
+    Node *curr = nullptr;
 
-  inline bool is_empty() const { return head == nullptr; };
+    inline bool is_empty() const
+    { return head == nullptr; };
 
 public:
-  Menu(Adafruit_SSD1306* display);
+    Menu(Adafruit_SSD1306 *display);
 
-  void insert(MenuItem item);
-  void update(const RotaryEncoder::Direction& dir);
+    void insert(MenuItem item);
 
-  void update_display();
+    void update(const RotaryEncoder::Direction &dir);
 
-  MenuItem& get() { return curr->item; }; // TODO error handling
+    void update_display();
+
+    MenuItem &get()
+    { return curr->item; }; // TODO error handling
 
 };
 

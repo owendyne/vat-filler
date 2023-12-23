@@ -6,11 +6,12 @@
 class LiquidSensor
 {
 private:
-  int pin;
+    int pin;
 public:
-  LiquidSensor(int pin) : pin(pin) {};
+    LiquidSensor(int pin) : pin(pin)
+    {};
 
-  double read();
+    double read();
 };
 
 
