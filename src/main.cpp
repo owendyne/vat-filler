@@ -24,7 +24,6 @@ void setPumpState(bool enabled)
     int state = enabled ? HIGH : LOW;
     digitalWrite(Pins::L298N::E1, state);
     digitalWrite(Pins::L298N::E2, state);
-    digitalWrite(Pins::LED, state);
 
     if (enabled) stepper.move(Config::StepDelta);
     else stepper.stop();
@@ -32,16 +31,12 @@ void setPumpState(bool enabled)
     pump_active = enabled;
 }
 
-
-
-
 void setup()
 {
     Serial.begin(9600);
 
     pinMode(Pins::L298N::E1, OUTPUT);
     pinMode(Pins::L298N::E2, OUTPUT);
-    pinMode(Pins::LED, OUTPUT);
     pinMode(Pins::STOP, INPUT);
 
     setPumpState(false);
@@ -61,9 +56,6 @@ void loop()
         }
         while (digitalRead(Pins::STOP) == HIGH)
         {
-            digitalWrite(Pins::LED, HIGH);
-            delay(500);
-            digitalWrite(Pins::LED, LOW);
             delay(500);
         }
         if (pump_active)
