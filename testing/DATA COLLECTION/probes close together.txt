@@ -1,0 +1,37 @@
+Ave GOOD
+941.17	Average Filtered A1: 763.71	Resin level: GOOD
+Average Filtered A0: 917.28	Average Filtered A1: 673.72	Resin level: GOOD
+Average Filtered A0: 901.70	Average Filtered A1: 626.22	Resin level: GOOD
+Average Filtered A0: 903.56	Average Filtered A1: 629.43	Resin level: GOOD
+Average Filtered A0: 902.87	Average Filtered A1: 629.12	Resin level: GOOD
+Average Filtered A0: 902.86	Average Filtered A1: 629.04	Resin level: GOOD
+Average Filtered A0: 902.72	Average Filtered A1: 629.04	Resin level: GOOD
+Average Filtered A0: 901.19	Average Filtered A1: 629.12	Resin level: GOOD
+Average Filtered A0: 903.48	Average Filtered A1: 629.40	Resin level: GOOD
+Average Filtered A0: 902.91	Average Filtered A1: 629.32	Resin level: GOOD
+Average Filtered A0: 903.28	Average Filtered A1: 629.37	Resin level: GOOD
+Average Filtered A0: 901.80	Average Filtered A1: 628.99	Resin level: GOOD
+Average Filtered A0: 902.23	Average Filtered A1: 629.68	Resin level: GOOD
+Average Filtered A0: 901.27	Average Filtered A1: 629.10	Resin level: GOOD
+Average Filtered A0: 900.66	Average Filtered A1: 628.47	Resin level: GOOD
+Average Filtered A0: 901.20	Average Filtered A1: 629.07	Resin level: GOOD
+Average Filtered A0: 900.62	Average Filtered A1: 628.76	Resin level: GOOD
+Average Filtered A0: 900.56	Average Filtered A1: 628.60	Resin level: GOOD
+Average Filtered A0: 900.71	Average Filtered A1: 629.00	Resin level: GOOD
+Average Filtered A0: 899.82	Average Filtered A1: 628.68	Resin level: GOOD
+Average Filtered A0: 900.15	Average Filtered A1: 628.71	Resin level: GOOD
+Average Filtered A0: 901.97	Average Filtered A1: 629.12	Resin level: GOOD
+Average Filtered A0: 899.56	Average Filtered A1: 628.61	Resin level: GOOD
+Average Filtered A0: 900.53	Average Filtered A1: 629.02	Resin level: GOOD
+Average Filtered A0: 899.08	Average Filtered A1: 628.37	Resin level: GOOD
+Average Filtered A0: 899.26	Average Filtered A1: 628.22	Resin level: GOOD
+Average Filtered A0: 899.80	Average Filtered A1: 628.47	Resin level: GOOD
+Average Filtered A0: 898.97	Average Filtered A1: 629.22	Resin level: GOOD
+Average Filtered A0: 899.28	Average Filtered A1: 628.96	Resin level: GOOD
+Average Filtered A0: 899.04	Average Filtered A1: 633.12	Resin level: GOOD
+Average Filtered A0: 933.06	Average Filtered A1: 743.48	Resin level: GOOD
+Average Filtered A0: 899.27	Average Filtered A1: 628.09	Resin level: GOOD
+Average Filtered A0: 898.87	Average Filtered A1: 627.22	Resin level: GOOD
+Average Filtered A0: 899.39	Average Filtered A1: 626.92	Resin level: GOOD
+Average Filtered A0: 899.38	Average Filtered A1: 626.92	Resin level: GOOD
+Average Filtered A0: 901.08	Average Filtered A1: 627.53	Resin level: GOOD
