@@ -1,73 +1,84 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 
-// Define pins for the L298N and buttons as constants for clarity
+// Define motor and button pins
 const int motorPin1 = 9;   // L298N Input 1
 const int motorPin2 = 11;  // L298N Input 2
 const int motorPin3 = 6;   // L298N Input 3
 const int motorPin4 = 5;   // L298N Input 4
 const int enablePin1 = 10; // L298N Enable Pin 1
 const int enablePin2 = 7;  // L298N Enable Pin 2
-const int buttonPin2 = 2;  // Button pin for forward direction
-const int buttonPin3 = 3;  // Button pin for reverse direction
+const int buttonPinForward = 2; // Button pin for forward direction
+const int buttonPinReverse = 3; // Button pin for reverse direction
 
-// Create a new instance of the AccelStepper class
-AccelStepper stepper(AccelStepper::HALF4WIRE, motorPin1, motorPin2, motorPin3, motorPin4);
+// Create AccelStepper object
+AccelStepper stepper(AccelStepper::FULL4WIRE, motorPin1, motorPin2, motorPin3, motorPin4);
+
+// Debouncing variables
+unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+unsigned long debounceDelay = 100;    // the debounce time; increase if the output flickers
+bool lastForwardState = HIGH;        // the previous reading from the input pin
+bool lastReverseState = HIGH;        // the previous reading from the input pin
+bool forwardPressed = false;
+bool reversePressed = false;
 
 void setup() {
     Serial.begin(9600);
     pinMode(enablePin1, OUTPUT);
     pinMode(enablePin2, OUTPUT);
-    pinMode(buttonPin2, INPUT_PULLUP);
-    pinMode(buttonPin3, INPUT_PULLUP);
+    pinMode(buttonPinForward, INPUT_PULLUP);
+    pinMode(buttonPinReverse, INPUT_PULLUP);
 
-    digitalWrite(enablePin1, HIGH);
-    digitalWrite(enablePin2, HIGH);
+    digitalWrite(enablePin1, LOW); // Disable the motor
+    digitalWrite(enablePin2, LOW); // Disable the motor
 
-    stepper.setMaxSpeed(1000);      // Set max speed of stepper (adjustable)
-    stepper.setAcceleration(500); // Set high acceleration for instant speed-up
+    stepper.setMaxSpeed(4000);      // Set max speed
+    stepper.setAcceleration(200);   // Set acceleration
+    stepper.setCurrentPosition(0);
 }
 
 void loop() {
-    static unsigned long lastButtonPress = 0;
-    unsigned long debounceDelay = 50;  // 50 milliseconds debounce period
+    int readingForward = digitalRead(buttonPinForward);
+    int readingReverse = digitalRead(buttonPinReverse);
 
-    if (millis() - lastButtonPress > debounceDelay) {
-        if (digitalRead(buttonPin2) == LOW) {
-            startPump(true, 500);
-            lastButtonPress = millis();
-        } else if (digitalRead(buttonPin3) == LOW) {
-            startPump(false, 500);
-            lastButtonPress = millis();
-        } else {
-            gradualStop();
-        }
+    // Check if the switch state has changed
+    if (readingForward != lastForwardState) {
+        lastDebounceTime = millis();
     }
-    stepper.run();
-}
-
-void startPump(bool direction, int finalSpeed) {
-    stepper.setSpeed(direction ? finalSpeed : -finalSpeed);
-    stepper.moveTo(direction ? 1000000000 : -1000000000);
-}
-
-
-void gradualStop() {
-    static int lastSpeed = 0;  // Last non-zero speed recorded
-
-    if (stepper.speed() != 0) {
-        lastSpeed = stepper.speed();
-        stepper.setSpeed(0); // Immediately set speed to 0 to trigger deceleration
-        stepper.setAcceleration(500); // Increase deceleration rate for a smoother stop
+    if (readingReverse != lastReverseState) {
+        lastDebounceTime = millis();
     }
 
-    if (stepper.distanceToGo() == 0) {
-        stepper.stop();
-        if (!stepper.isRunning()) {
-            stepper.disableOutputs(); // Disable outputs to save power once stopped
-        }
-    } else if (stepper.distanceToGo() != 0 && lastSpeed != 0) {
-        // If still moving or failed to stop, trigger a stop command
-        stepper.moveTo(stepper.currentPosition()); // Set target to current position to stop movement
+    if ((millis() - lastDebounceTime) > debounceDelay) {
+        // Update the actual button state if stable for longer than the debounceDelay
+        forwardPressed = readingForward == LOW;
+        reversePressed = readingReverse == LOW;
+    }
+
+    // Save the reading
+    lastForwardState = readingForward;
+    lastReverseState = readingReverse;
+
+    // Motor control logic
+    if (forwardPressed && !reversePressed) {
+        stepper.enableOutputs();
+        digitalWrite(enablePin1, HIGH); // Enable the motor to move
+        digitalWrite(enablePin2, HIGH); // Enable the motor to move
+        stepper.setSpeed(700);         // Set speed for forward movement
+        stepper.moveTo(1000000);  
+        stepper.run();                 // Move stepper at set speed
+    } else if (reversePressed && !forwardPressed) {
+        stepper.enableOutputs();
+        digitalWrite(enablePin1, HIGH); // Enable the motor to move
+        digitalWrite(enablePin2, HIGH); // Enable the motor to move
+        stepper.setSpeed(-700);        // Set speed for reverse movement
+        stepper.moveTo(-1000000);
+        stepper.run();                 // Move stepper at set speed
+    } else {
+        stepper.setSpeed(0);           // No buttons pressed, stop the motor
+        stepper.stop();                // Ensure stepper is stopped
+        stepper.disableOutputs();
+        digitalWrite(enablePin1, LOW); // Disable the motor
+        digitalWrite(enablePin2, LOW); // Disable the motor
     }
 }
