@@ -14,13 +14,9 @@ const int buttonPinReverse = 3; // Button pin for reverse direction
 // Create AccelStepper object
 AccelStepper stepper(AccelStepper::FULL4WIRE, motorPin1, motorPin2, motorPin3, motorPin4);
 
-// Debouncing variables
-unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
-unsigned long debounceDelay = 100;    // the debounce time; increase if the output flickers
-bool lastForwardState = HIGH;        // the previous reading from the input pin
-bool lastReverseState = HIGH;        // the previous reading from the input pin
-bool forwardPressed = false;
-bool reversePressed = false;
+//int maxSpeed = 850; // Maximum speed
+
+int maxSpeed = 650; // Maximum speed
 
 void setup() {
     Serial.begin(9600);
@@ -29,56 +25,38 @@ void setup() {
     pinMode(buttonPinForward, INPUT_PULLUP);
     pinMode(buttonPinReverse, INPUT_PULLUP);
 
-    digitalWrite(enablePin1, LOW); // Disable the motor
-    digitalWrite(enablePin2, LOW); // Disable the motor
+    digitalWrite(enablePin1, LOW); // Initially disable the motor
+    digitalWrite(enablePin2, LOW); // Initially disable the motor
+    
+    stepper.setMinPulseWidth(20); 
+    stepper.setMaxSpeed(maxSpeed);      // Set max speed
+    stepper.setAcceleration(400);       // Set acceleration
+    //stepper.setAcceleration(300);       // Set acceleration
 
-    stepper.setMaxSpeed(4000);      // Set max speed
-    stepper.setAcceleration(200);   // Set acceleration
-    stepper.setCurrentPosition(0);
+    pinMode(12, OUTPUT);
 }
 
 void loop() {
-    int readingForward = digitalRead(buttonPinForward);
-    int readingReverse = digitalRead(buttonPinReverse);
+    bool forwardPressed = digitalRead(buttonPinForward) == LOW;
+    bool reversePressed = digitalRead(buttonPinReverse) == LOW;
 
-    // Check if the switch state has changed
-    if (readingForward != lastForwardState) {
-        lastDebounceTime = millis();
-    }
-    if (readingReverse != lastReverseState) {
-        lastDebounceTime = millis();
-    }
-
-    if ((millis() - lastDebounceTime) > debounceDelay) {
-        // Update the actual button state if stable for longer than the debounceDelay
-        forwardPressed = readingForward == LOW;
-        reversePressed = readingReverse == LOW;
-    }
-
-    // Save the reading
-    lastForwardState = readingForward;
-    lastReverseState = readingReverse;
-
-    // Motor control logic
-    if (forwardPressed && !reversePressed) {
-        stepper.enableOutputs();
-        digitalWrite(enablePin1, HIGH); // Enable the motor to move
-        digitalWrite(enablePin2, HIGH); // Enable the motor to move
-        stepper.setSpeed(700);         // Set speed for forward movement
-        stepper.moveTo(1000000);  
-        stepper.run();                 // Move stepper at set speed
-    } else if (reversePressed && !forwardPressed) {
-        stepper.enableOutputs();
-        digitalWrite(enablePin1, HIGH); // Enable the motor to move
-        digitalWrite(enablePin2, HIGH); // Enable the motor to move
-        stepper.setSpeed(-700);        // Set speed for reverse movement
-        stepper.moveTo(-1000000);
-        stepper.run();                 // Move stepper at set speed
+    if (forwardPressed) {
+        digitalWrite(12, HIGH);
+        digitalWrite(enablePin1, HIGH);
+        digitalWrite(enablePin2, HIGH);
+        stepper.setSpeed(maxSpeed);
+        stepper.runSpeed();
+    } else if (reversePressed) {
+        digitalWrite(12, HIGH);
+        digitalWrite(enablePin1, HIGH);
+        digitalWrite(enablePin2, HIGH);
+        stepper.setSpeed(-maxSpeed);
+        stepper.runSpeed();
     } else {
-        stepper.setSpeed(0);           // No buttons pressed, stop the motor
-        stepper.stop();                // Ensure stepper is stopped
-        stepper.disableOutputs();
-        digitalWrite(enablePin1, LOW); // Disable the motor
-        digitalWrite(enablePin2, LOW); // Disable the motor
+        digitalWrite(12, LOW);
+        stepper.setSpeed(0);    // Stop the motor immediately when no buttons are pressed
+        stepper.stop();         // Stop the stepper motor as quickly as possible
+        digitalWrite(enablePin1, LOW); // Disable the motor outputs
+        digitalWrite(enablePin2, LOW); // Disable the motor outputs
     }
 }
