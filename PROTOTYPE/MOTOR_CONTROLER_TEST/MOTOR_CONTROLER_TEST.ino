@@ -57,6 +57,9 @@ float previousFilteredA0 = 0;
 bool readA0Next = true;
 
 void setup() {
+
+  delay(500);
+  
   // Initialize Serial communication
   Serial.begin(9600);
   Serial.println("Vat Filler Prototype Test");
