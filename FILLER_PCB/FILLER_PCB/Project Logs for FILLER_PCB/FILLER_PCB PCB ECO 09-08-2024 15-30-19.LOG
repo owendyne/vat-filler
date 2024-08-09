@@ -1,0 +1,5 @@
+Removed Pin From Net: NetName=MS2 Pin=U1-9
+Removed Pin From Net: NetName=MS3 Pin=U1-10
+Added Pin To Net: NetName=MS3 Pin=U1-9
+Added Pin To Net: NetName=MS2 Pin=U1-10
+Added Room: Name=FILLER_PCB
